@@ -4,87 +4,67 @@ import java.util.*;
 
 public class RPNCalculator {
 
+    private static final Map<String, Operator> operators = new HashMap<>();
+
+    static {
+        operators.put("+", new Addition());
+        operators.put("-", new Subtraction());
+        operators.put("*", new Multiplication());
+    }
+
     public static double evaluateRPN(String expression) {
         if (expression == null || expression.isEmpty()) {
             throw new IllegalArgumentException("Expression must not be null or empty");
         }
         
-        // Split the expression into tokens
         String[] tokens = expression.split("\\s+");
-        
-        // Stack to store operands
         Deque<Double> stack = new ArrayDeque<>();
         
-        // Operators set
-        Set<String> operators = new HashSet<>(Arrays.asList("+", "-", "*", "/", "SQRT", "MAX"));
-        
-        // Process each token
         for (String token : tokens) {
-            if (!operators.contains(token)) {
-                // Token is a number, push it onto the stack
-                try {
-                    double number = Double.parseDouble(token);
-                    stack.push(number);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Invalid token encountered: " + token);
+            if (isNumeric(token)) {
+                stack.push(Double.parseDouble(token));
+            } else if (isOperator(token)) {
+                if (stack.size() < 2) {
+                    throw new IllegalArgumentException("Not enough operands for " + token + " operator");
                 }
-            } else {
-                // Token is an operator, perform the operation
+                double operand2 = stack.pop();
+                double operand1 = stack.pop();
                 switch (token) {
                     case "+":
-                        if (stack.size() < 2) {
-                            throw new IllegalArgumentException("Not enough operands for + operator");
-                        }
-                        stack.push(stack.pop() + stack.pop());
+                        stack.push(operand1 + operand2);
                         break;
                     case "-":
-                        if (stack.size() < 2) {
-                            throw new IllegalArgumentException("Not enough operands for - operator");
-                        }
-                        double subtrahend = stack.pop();
-                        double minuend = stack.pop();
-                        stack.push(minuend - subtrahend);
+                        stack.push(operand1 - operand2);
                         break;
                     case "*":
-                        if (stack.size() < 2) {
-                            throw new IllegalArgumentException("Not enough operands for * operator");
-                        }
-                        stack.push(stack.pop() * stack.pop());
-                        break;
-                    case "/":
-                        if (stack.size() < 2) {
-                            throw new IllegalArgumentException("Not enough operands for / operator");
-                        }
-                        double divisor = stack.pop();
-                        double dividend = stack.pop();
-                        stack.push(dividend / divisor);
-                        break;
-                    case "SQRT":
-                        if (stack.isEmpty()) {
-                            throw new IllegalArgumentException("Not enough operands for SQRT operator");
-                        }
-                        stack.push(Math.sqrt(stack.pop()));
-                        break;
-                    case "MAX":
-                        if (stack.size() < 2) {
-                            throw new IllegalArgumentException("Not enough operands for MAX operator");
-                        }
-                        double maxOperand2 = stack.pop();
-                        double maxOperand1 = stack.pop();
-                        stack.push(Math.max(maxOperand1, maxOperand2));
+                        stack.push(operand1 * operand2);
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown operator: " + token);
                 }
+            } else {
+                throw new IllegalArgumentException("Invalid token encountered: " + token);
             }
         }
         
-        // At the end, there should be exactly one element in the stack, which is the result
         if (stack.size() != 1) {
             throw new IllegalArgumentException("Invalid expression format");
         }
         
         return stack.pop();
+    }
+    
+    private static boolean isNumeric(String token) {
+        try {
+            Double.parseDouble(token);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    private static boolean isOperator(String token) {
+        return token.equals("+") || token.equals("-") || token.equals("*");
     }
     
 }
