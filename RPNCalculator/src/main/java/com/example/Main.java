@@ -8,7 +8,7 @@ public class Main {
         String expression2 = "4 2 + 3 -";
         String expression3 = "3 5 8 * 7 + *";
         String expression4 = "4 2 -";
-        String expression5 = "0 0 *";
+        String expression5 = "3 5 8 * 7 - *";
         
         // Evaluate expressions using RPNCalculator and print results
         System.out.println(expression1 + " = " + RPNCalculator.evaluateRPN(expression1));
