@@ -32,22 +32,22 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Install dependencies
-      run: mvn clean compile
+      run: mvn -f RPNCalculator/pom.xml clean compile
 
     - name: Run tests
-      run: mvn test
+      run: mvn -f RPNCalculator/pom.xml test
 
     - name: Generate JaCoCo report
-      run: mvn jacoco:report
+      run: mvn -f RPNCalculator/pom.xml jacoco:report
 
     - name: Upload test results
       uses: actions/upload-artifact@v2
       with:
         name: test-results
-        path: target/surefire-reports/
+        path: RPNCalculator/target/surefire-reports/
 
     - name: Upload JaCoCo report
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
-        path: target/site/jacoco/
+        path: RPNCalculator/target/site/jacoco/
